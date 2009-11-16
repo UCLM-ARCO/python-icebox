@@ -1,0 +1,61 @@
+# -*- mode: python; coding: utf-8 -*-
+
+def createConfigs(kwargs):
+    for name,content in kwargs.items():
+        f = None
+        try:
+            f = open(name, "w")
+            f.write(content)
+            f.flush()
+        finally:
+            if f: f.close()
+    return 0
+
+# config files
+config_icebox = '''
+IceBox.Service.TestService1 = TestService.ServiceI --Ice.Config=service.config1
+IceBox.Service.TestService2 = TestService.ServiceI --Ice.Config=service.config2
+IceBox.UseSharedCommunicator.TestService1=1
+IceBox.UseSharedCommunicator.TestService2=1
+'''
+config_service1 = '''
+TestService1OA.Endpoints = tcp -h localhost -p 9988
+Service1.UniqueProperty = 1
+'''
+config_service2 = '''
+TestService2OA.Endpoints = tcp -h localhost -p 9989
+'''
+
+configs = TaskFunc(createConfigs,
+                   [{"icebox.config":config_icebox,
+                     "service.config1":config_service1,
+                     "service.config2":config_service2}])
+configs.gen += ["icebox.config", "service.config1", "service.config2"]
+
+
+def testProperties(str_prx1, str_prx2):
+    import Ice
+    Ice.loadSlice("Test.ice -I /usr/share/slice")
+    import Test
+
+    ice = Ice.initialize()
+    prx1 = Test.TestIntfPrx.checkedCast(ice.stringToProxy(str_prx1))
+    prx2 = Test.TestIntfPrx.checkedCast(ice.stringToProxy(str_prx2))
+
+    assert prx1.getProperty("Service1.UniqueProperty") is "1"
+    assert prx2.getProperty("Service1.UniqueProperty") is "1"
+    return 0
+
+
+# Launch service
+d = Daemon("../pyicebox --Ice.Config=icebox.config", env={"PYTHONPATH":"."})
+d.pre += Not(OpenPort(9988))
+d.pre += Not(OpenPort(9989))
+
+# has Service2 Service1 properties? (only when sharing communicator)
+str_prx1 = "TestService1Object -t:tcp -h localhost -p 9988"
+str_prx2 = "TestService2Object -t:tcp -h localhost -p 9989"
+t = TaskFunc(testProperties, [str_prx1, str_prx2])
+t.pre += Poll(OpenPort(9988), 0.2, 2)
+t.pre += Poll(OpenPort(9989), 0.2, 2)
+

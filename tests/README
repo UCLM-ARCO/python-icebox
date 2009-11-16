@@ -1,0 +1,11 @@
+-*- coding: utf-8 -*-
+
+This tests are (in part) a derivative work, taken from
+Java version of IceBox tests, by ZeroC ICE.
+
+To launch all, on 'tests' directory, run:
+
+ $ atheist .
+
+It need all packages specified in DEPENDS file to be installed.
+
