@@ -3,6 +3,7 @@
 import Ice
 import IceBox
 
+import sys
 import os
 cwd = os.path.dirname(__file__)
 Ice.loadSlice("%s/Test.ice -I /usr/share/slice" % cwd)
@@ -25,15 +26,22 @@ class TestIntfI(Test.TestIntf):
 class ServiceI(IceBox.Service):
 
     def start(self, name, communicator, args):
+        self.name = name
 
         self._oa = communicator.createObjectAdapter(name + "OA")
         srv = TestIntfI(args)
         oid = communicator.stringToIdentity(name + "Object")
-        print "PRX: '" + str(self._oa.add(srv, oid)) + "'"
-
+        self._oa.add(srv, oid)
         self._oa.activate()
+
+        print self.name + " started"
+        sys.stdout.flush()
+
 
     def stop(self):
         self._oa.deactivate()
         self._oa.destroy()
+
+        print self.name + " stopped"
+        sys.stdout.flush()
 

@@ -1,0 +1,51 @@
+# -*- mode: python; coding: utf-8 -*-
+
+def createConfigs(kwargs):
+    for name,content in kwargs.items():
+        f = None
+        try:
+            f = open(name, "w")
+            f.write(content)
+            f.flush()
+        finally:
+            if f: f.close()
+    return 0
+
+# config files
+config_icebox = '''
+IceBox.Service.TestService1 = TestService.ServiceI --Ice.Config=service.config1
+IceBox.Service.TestService2 = TestService.ServiceI --Ice.Config=service.config2
+IceBox.Service.TestService3 = TestService.ServiceI --Ice.Config=service.config3
+IceBox.LoadOrder=TestService1,TestService2,TestService3
+'''
+config_service1 = '''
+TestService1OA.Endpoints = tcp -h localhost -p 9988
+'''
+config_service2 = '''
+TestService2OA.Endpoints = tcp -h localhost -p 9989
+'''
+config_service3 = '''
+TestService3OA.Endpoints = tcp -h localhost -p 9990
+'''
+
+configs = TaskFunc(createConfigs,
+                   [{"icebox.config":config_icebox,
+                     "service.config1":config_service1,
+                     "service.config2":config_service2,
+                     "service.config3":config_service3}])
+configs.gen += ["icebox.config", "service.config1",
+                "service.config2", "service.config3"]
+
+
+# Launch services
+d = Daemon("../pyicebox --Ice.Config=icebox.config",
+           env={"PYTHONPATH":"."}, save_stdout=True)
+d.post += FileContains(d.stdout,
+                       "TestService1 started\n"
+                       "TestService2 started\n"
+                       "TestService3 started")
+
+
+# Hack: run daemon at least 'delay' secs
+Task("true", delay=1)
+

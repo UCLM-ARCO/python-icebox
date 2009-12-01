@@ -1,0 +1,51 @@
+# -*- mode: python; coding: utf-8 -*-
+
+def createConfigs(kwargs):
+    for name,content in kwargs.items():
+        f = None
+        try:
+            f = open(name, "w")
+            f.write(content)
+            f.flush()
+        finally:
+            if f: f.close()
+    return 0
+
+config_icebox = '''
+IceBox.Service.TestService = TestService.ServiceI --Ice.Config=service.config
+IceBox.ServiceManager.Endpoints = tcp -h localhost -p 9999
+'''
+config_service = '''
+TestServiceOA.Endpoints = tcp -h localhost -p 9988
+'''
+
+configs = TaskFunc(createConfigs,
+                   [{"icebox.config":config_icebox,
+                     "service.config":config_service}])
+configs.gen += ["icebox.config", "service.config"]
+
+
+def testClient(str_prx):
+     import Ice, IceBox
+
+     ice = Ice.initialize()
+     prx = ice.stringToProxy(str_prx)
+     prx = IceBox.ServiceManagerPrx.checkedCast(prx)
+
+     prx.stopService("TestService")
+     return 0
+
+
+# Launch icebox
+str_prx = "IceBox/ServiceManager -t:tcp -h localhost -p 9999"
+d = Daemon("../pyicebox --Ice.Config=icebox.config",
+         env={"PYTHONPATH":"."}, save_stdout=True)
+d.pre += Not(OpenPort(9988))
+d.post += FileContains(d.stdout, "TestService stopped")
+
+
+# Stop TestService
+c = TaskFunc(testClient, [str_prx], )
+c.pre += TaskRunning(d)
+c.pre += Poll(OpenPort(9999), 0.2, 2)
+

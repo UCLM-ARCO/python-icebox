@@ -11,4 +11,5 @@ all: $(SLICES:)
 
 .PHONY: clean
 clean:
-	$(RM) -fv *.pyc *~
+	find . -name "*.pyc" | xargs $(RM)
+	find . -name "*~" | xargs $(RM)
