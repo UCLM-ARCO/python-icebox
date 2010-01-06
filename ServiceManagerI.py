@@ -397,7 +397,7 @@ class ServiceManagerI(IceBox.ServiceManager):
                 "ServiceManager: class " + classPath + " not found\n" + str(ex))
 
         except AttributeError, ex:
-            raise FailureException(
+            raise IceBox.FailureException(
                 "ServiceManager: module " + moduleName + " has not member " + className +
                 "\n" + str(ex))
 
