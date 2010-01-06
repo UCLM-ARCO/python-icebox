@@ -124,29 +124,29 @@ class Communicator(Ice.Communicator):
                 defaultLocator = self._communicator.getDefaultLocator()
 
                 if (defaultLocator and serverId) or instancename:
-                    if not _adminIdentity:
+                    if not self._adminIdentity:
 
                         if not instanceName:
                             instanceName = Ice.generateUUID()
 
-                        _adminIdentity = Ice.Identity("admin", instanceName)
+                        self._adminIdentity = Ice.Identity("admin", instanceName)
                         # Afterwards, _adminIdentity is read-only
 
                     # Create OA
-                    _adminAdapter = self._communicator.createObjectAdapter(adminOA, "", null)
+                    self._adminAdapter = self._communicator.createObjectAdapter(adminOA)
 
                     # Add all facets to OA
                     filteredFacets = {}
                     for key, value in self._adminFacets.items():
-                        if not _adminFacetFilter or key in _adminFacetFilter:
-                            _adminAdapter.addFacet(value, _adminIdentity, key)
+                        if not self._adminFacetFilter or key in self._adminFacetFilter:
+                            self._adminAdapter.addFacet(value, self._adminIdentity, key)
 
                         else:
                             filteredFacets[key] = value
 
                     self._adminFacets = filteredFacets
 
-                    adapter = _adminAdapter
+                    adapter = self._adminAdapter
 
         if not adapter:
             return None

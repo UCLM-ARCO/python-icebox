@@ -114,7 +114,7 @@ class Options:
                 else:
                     arg.append(c) # Everything else is taken literally.
 
-            elif case == SingleQuoteState:
+            elif state == SingleQuoteState:
 
                 if c == '\'': # End of single-quote mode.
                     state = NormalState
@@ -122,7 +122,7 @@ class Options:
                 else:
                     arg.append(c) # Everything else is taken literally.
 
-            elif case == ANSIQuoteState:
+            elif state == ANSIQuoteState:
 
                 if c == '\\':
                     if i != len(line) - 1:
