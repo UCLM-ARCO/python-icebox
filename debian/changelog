@@ -1,3 +1,10 @@
+pyicebox (0.100107-1) unstable; urgency=low
+
+  * New upstream release
+  * Fixed some un-tracked bugs
+
+ -- Oscar Aceña <oscaracena@gmail.com>  Thu, 07 Jan 2010 10:32:05 +0100
+
 pyicebox (0.091201-1) unstable; urgency=low
 
   * Initial release

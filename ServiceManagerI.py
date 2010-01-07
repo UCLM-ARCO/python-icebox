@@ -398,7 +398,7 @@ class ServiceManagerI(IceBox.ServiceManager):
 
         except AttributeError, ex:
             raise IceBox.FailureException(
-                "ServiceManager: module " + moduleName + " has not member " + className +
+                "ServiceManager: module " + moduleName + " has no member " + className +
                 "\n" + str(ex))
 
         except TypeError, ex:
