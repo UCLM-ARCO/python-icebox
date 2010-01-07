@@ -8,7 +8,9 @@ install:
 	install -D -m 644 *.ice $(DEST)
 	install -D -m 644 icebox.config $(DEST)
 	chmod a+x $(DEST)/Server.py
-	ln -s $(DEST)/Server.py $(DESTDIR)/usr/bin/pyicebox
+
+#	# FIXME: use a relative path
+	ln -s /usr/share/pyicebox/Server.py $(DESTDIR)/usr/bin/pyicebox
 
 .PHONY: clean
 clean:
