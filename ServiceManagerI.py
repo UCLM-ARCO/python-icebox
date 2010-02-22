@@ -193,11 +193,11 @@ class ServiceManagerI(IceBox.ServiceManager):
         if activeServices:
 
             class AMI_ServiceObserver_servicesStarted:
-                def ice_response():
+                def ice_response(self):
                     # ok, success
                     pass
 
-                def ice_exception(ex):
+                def ice_exception(self, ex):
                     # Drop this observer
                     self._removeObserver(observer, ex)
 
@@ -573,11 +573,11 @@ class ServiceManagerI(IceBox.ServiceManager):
         if services:
 
             class AMI_ServiceObserver_servicesStarted:
-                def ice_response():
+                def ice_response(self):
                     # ok, success
                     pass
 
-                def ice_exception(ex):
+                def ice_exception(self, ex):
                     # Drop this observer
                     self._removeObserver(observer, ex)
 
@@ -590,11 +590,11 @@ class ServiceManagerI(IceBox.ServiceManager):
         if services:
 
             class AMI_ServiceObserver_servicesStopped:
-                def ice_response():
+                def ice_response(self):
                     # ok, success
                     pass
 
-                def ice_exception(ex):
+                def ice_exception(self, ex):
                     # Drop this observer
                     self._removeObserver(observer, ex)
 
