@@ -606,7 +606,7 @@ class ServiceManagerI(IceBox.ServiceManager):
     @synchronized
     def _removeObserver(self, observer, ex):
         if observer in self._observers:
-            self.observers.remove(observer)
+            self._observers.remove(observer)
             self.observerRemoved(observer, ex)
 
 
