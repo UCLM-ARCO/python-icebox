@@ -193,11 +193,11 @@ class ServiceManagerI(IceBox.ServiceManager):
         if activeServices:
 
             class AMI_ServiceObserver_servicesStarted:
-                def ice_response(self):
+                def ice_response(cls):
                     # ok, success
                     pass
 
-                def ice_exception(self, ex):
+                def ice_exception(cls, ex):
                     # Drop this observer
                     self._removeObserver(observer, ex)
 
@@ -573,11 +573,11 @@ class ServiceManagerI(IceBox.ServiceManager):
         if services:
 
             class AMI_ServiceObserver_servicesStarted:
-                def ice_response(self):
+                def ice_response(cls):
                     # ok, success
                     pass
 
-                def ice_exception(self, ex):
+                def ice_exception(cls, ex):
                     # Drop this observer
                     self._removeObserver(observer, ex)
 
@@ -590,11 +590,11 @@ class ServiceManagerI(IceBox.ServiceManager):
         if services:
 
             class AMI_ServiceObserver_servicesStopped:
-                def ice_response(self):
+                def ice_response(cls):
                     # ok, success
                     pass
 
-                def ice_exception(self, ex):
+                def ice_exception(cls, ex):
                     # Drop this observer
                     self._removeObserver(observer, ex)
 
@@ -604,13 +604,13 @@ class ServiceManagerI(IceBox.ServiceManager):
 
 
     @synchronized
-    def _removeObserver(observer, ex):
+    def _removeObserver(self, observer, ex):
         if observer in self._observers:
             self.observers.remove(observer)
             self.observerRemoved(observer, ex)
 
 
-    def observerRemoved(observer, ex):
+    def observerRemoved(self, observer, ex):
         if self._traceServiceObserver >= 1:
 
             # CommunicatorDestroyedException may occur during shutdown. The observer notification has
