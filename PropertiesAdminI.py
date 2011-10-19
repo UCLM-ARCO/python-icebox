@@ -1,6 +1,6 @@
 # -*- mode: python; coding: utf-8 -*-
 
-# Copyright (c) 2009 Arco Labs.
+# Copyright (c) 2009-2011 Oscar Aceña.
 # Based on Java version of IceBox, by ZeroC, Inc.
 
 # This file is part of PyIceBox.
