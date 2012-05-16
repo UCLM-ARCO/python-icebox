@@ -26,10 +26,10 @@ from __future__ import with_statement
 from threading import Lock
 import Ice
 
-from ProcessI import ProcessI
-from PropertiesAdminI import PropertiesAdminI
-from TraceLevels import TraceLevels
-from Util import synchronized
+from icebox.ProcessI import ProcessI
+from icebox.PropertiesAdminI import PropertiesAdminI
+from icebox.TraceLevels import TraceLevels
+from icebox.Util import synchronized
 
 
 class Communicator(Ice.Communicator):

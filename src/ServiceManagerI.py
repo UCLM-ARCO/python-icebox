@@ -29,16 +29,17 @@ from StringIO import StringIO
 import Ice
 import IceBox
 
-import UtilInternal
-from PropertiesAdminI import PropertiesAdminI
-from Util import synchronized
+from icebox import UtilInternal
+from icebox.PropertiesAdminI import PropertiesAdminI
+from icebox.Util import synchronized
 
 
 # format traceback messages
 def _ftrace(msg):
     r = []
     for c in msg:
-        if c == "\n": c = "\n    ->  "
+        if c == "\n":
+            c = "\n    ->  "
         r.append(c)
     return "".join(r)
 

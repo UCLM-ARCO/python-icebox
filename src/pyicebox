@@ -22,7 +22,7 @@
 import sys
 import Ice
 
-from ServiceManagerI import ServiceManagerI
+from icebox.ServiceManagerI import ServiceManagerI
 
 
 class Server(Ice.Application):

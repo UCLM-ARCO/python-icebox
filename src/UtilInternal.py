@@ -16,6 +16,5 @@
 # You should have received a copy of the GNU General Public License
 # along with PyIceBox.  If not, see <http://www.gnu.org/licenses/>.
 
-from Options import Options
-from Communicator import Communicator
-
+from icebox.Options import Options
+from icebox.Communicator import Communicator
