@@ -14,5 +14,6 @@ install:
 
 .PHONY: clean
 clean:
-	find . -name "*.pyc" | xargs $(RM)
-	find . -name "*~" | xargs $(RM)
+	find . -name "*.pyc" -delete
+	find . -name "*~" -delete
+

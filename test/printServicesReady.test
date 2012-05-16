@@ -1,0 +1,10 @@
+# -*- mode: python; coding: utf-8 -*-
+
+# Launch service
+d = Daemon('$basedir/src/pyicebox --IceBox.PrintServicesReady=nothing')
+d.post += FileContains("nothing ready")
+
+
+
+
+

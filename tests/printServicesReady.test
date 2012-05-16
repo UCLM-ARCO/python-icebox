@@ -1,7 +1,0 @@
-# -*- mode: python; coding: utf-8 -*-
-
-# Launch service
-t = Task('../pyicebox --IceBox.PrintServicesReady=nothing',
-         save_stdout=True, detach=True, timeout=1, expected=-9)
-t.post += FileContains(t.stdout, "nothing ready")
-

@@ -1,0 +1,27 @@
+# -*- mode: python; coding: utf-8 -*-
+
+# Create config
+config_file = "$testdir/service.cfg"
+config_data = """
+IceBox.Service.TestService1 = TestService.ServiceI --Ice.Config={0}
+IceBox.Service.TestService2 = TestService.ServiceI --Ice.Config={0}
+IceBox.Service.TestService3 = TestService.ServiceI --Ice.Config={0}
+IceBox.LoadOrder=TestService1,TestService3,TestService2
+
+TestService1OA.Endpoints = tcp -h localhost -p 9988
+TestService2OA.Endpoints = tcp -h localhost -p 9989
+TestService3OA.Endpoints = tcp -h localhost -p 9990
+""".format(config_file)
+
+cfg = Test("echo '{0}' > {1}".format(config_data, config_file), shell=True)
+cfg.gen += config_file
+
+
+# Launch services
+d = Daemon("$basedir/src/pyicebox --Ice.Config={0}".format(config_file),
+           env={"PYTHONPATH":"$testdir"}, delay=1)
+d.post += FileContains("TestService1 started\n"
+                       "TestService3 started\n"
+                       "TestService2 started")
+
+

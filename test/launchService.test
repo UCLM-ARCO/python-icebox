@@ -1,0 +1,23 @@
+# -*- mode: python; coding: utf-8 -*-
+
+# Create config
+config_file = "$testdir/service.cfg"
+config_data = """
+IceBox.Service.TestService = TestService.ServiceI --Ice.Config={0}
+TestServiceOA.Endpoints = tcp -h localhost -p 9988
+""".format(config_file)
+
+cfg = Test("echo '{0}' > {1}".format(config_data, config_file), shell=True)
+cfg.gen += config_file
+
+
+# Launch service
+str_prx = "TestServiceObject -t:tcp -h localhost -p 9988"
+d = Daemon("$basedir/src/pyicebox --Ice.Config={0}".format(config_file),
+           env={"PYTHONPATH":"$testdir"})
+d.pre += Not(OpenPort(9988))
+
+
+# Object is reachable?
+Test("$testdir/check_object.py '{0}'".format(str_prx))
+

@@ -1,0 +1,27 @@
+# -*- mode: python; coding: utf-8 -*-
+
+# Create config
+config_file = "$testdir/service.cfg"
+config_data = """
+IceBox.Service.TestService = TestService.ServiceI --Ice.Config={0}
+IceBox.ServiceManager.Endpoints = tcp -h localhost -p 9999
+TestServiceOA.Endpoints = tcp -h localhost -p 9988
+""".format(config_file)
+
+cfg = Test("echo '{0}' > {1}".format(config_data, config_file), shell=True)
+cfg.gen += config_file
+
+
+# Launch icebox
+str_prx = "IceBox/ServiceManager -t:tcp -h localhost -p 9999"
+d = Daemon("$basedir/src/pyicebox --Ice.Config={0}".format(config_file),
+           env={"PYTHONPATH":"$testdir"})
+d.pre += Not(OpenPort(9988))
+d.post += FileContains("TestService stopped")
+
+
+# Stop TestService
+t = Test("$testdir/stop_service.py '{0}'".format(str_prx))
+t.pre += TaskRunning(d)
+t.pre += Poll(OpenPort(9999), 0.2, 2)
+

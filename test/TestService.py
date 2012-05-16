@@ -6,7 +6,7 @@ import IceBox
 import sys
 import os
 cwd = os.path.dirname(__file__)
-Ice.loadSlice("%s/Test.ice -I /usr/share/slice" % cwd)
+Ice.loadSlice("%s/Test.ice -I /usr/share/Ice/slice" % cwd)
 import Test
 
 

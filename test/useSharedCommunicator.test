@@ -1,0 +1,39 @@
+# -*- mode: python; coding: utf-8 -*-
+
+# Create configs
+config2_file = "$testdir/service2.cfg"
+config2_data = """
+Service1.UniqueProperty = 1
+TestService2OA.Endpoints = tcp -h localhost -p 9989
+"""
+
+cfg2 = Test("echo '{0}' > {1}".format(config2_data, config2_file), shell=True)
+cfg2.gen += config2_file
+
+config1_file = "$testdir/service1.cfg"
+config1_data = """
+IceBox.Service.TestService1 = TestService.ServiceI --Ice.Config={0}
+IceBox.Service.TestService2 = TestService.ServiceI --Ice.Config={1}
+IceBox.UseSharedCommunicator.TestService1=1
+IceBox.UseSharedCommunicator.TestService2=1
+TestService1OA.Endpoints = tcp -h localhost -p 9988
+""".format(config1_file, config2_file)
+
+cfg1 = Test("echo '{0}' > {1}".format(config1_data, config1_file), shell=True)
+cfg1.gen += config1_file
+
+
+# Launch service
+d = Daemon("$basedir/src/pyicebox --Ice.Config={0}".format(config1_file),
+           env={"PYTHONPATH":"$testdir"})
+d.pre += Not(OpenPort(9988))
+d.pre += Not(OpenPort(9989))
+
+
+# has Service2 Service1 properties? (only when sharing communicator)
+str_prx1 = "TestService1Object -t:tcp -h localhost -p 9988"
+str_prx2 = "TestService2Object -t:tcp -h localhost -p 9989"
+t = Test("$testdir/check_properties.py '{0}' '{1}'".format(str_prx1, str_prx2))
+t.pre += Poll(OpenPort(9988), 0.2, 2)
+t.pre += Poll(OpenPort(9989), 0.2, 2)
+
