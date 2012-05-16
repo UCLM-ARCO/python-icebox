@@ -1,14 +1,14 @@
-Source: pyicebox
-Section: devel
+Source: python-icebox
+Section: python
 Priority: optional
-Maintainer: Oscar Aceña <oscaracena@gmail.com>
+Maintainer: Oscar Aceña Herrera <oscaracena@gmail.com>
 Build-Depends: debhelper (>= 7)
-Standards-Version: 3.8.3
-Homepage: https://arco.esi.uclm.es/svn/public/prj/pyicebox/
+Standards-Version: 3.9.3
+Homepage: http://bitbucket.org/arco_group/python-icebox/
 
-Package: pyicebox
+Package: python-icebox
 Architecture: all
-Depends: ${python:Depends}, python-zeroc-ice
+Depends: ${python:Depends}, ${misc:Depends}, python-zeroc-ice
 Description: Python version of ZeroC IceBox service.
  IceBox is a plugin-based meta-application for ZeroC Ice.
  See icebox package for more information.

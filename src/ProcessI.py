@@ -19,12 +19,9 @@
 
 
 import sys
-import os
 
 import Ice
-cwd = os.path.dirname(__file__)
-Ice.loadSlice("%s/Process.ice" % cwd)
-del cwd
+Ice.loadSlice("{0}/Ice/Process.ice".format(Ice.getSliceDir()))
 
 
 class ProcessI(Ice.Process):

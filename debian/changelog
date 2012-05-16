@@ -1,18 +1,24 @@
-pyicebox (0.100222-1) unstable; urgency=low
+python-icebox (0.120516-1) unstable; urgency=low
+
+  * New upstream release (support Ice3.4)
+
+ -- Oscar Aceña Herrera <oscaracena@gmail.com>  Wed, 16 May 2012 17:05:07 +0200
+
+python-icebox (0.100222-1) unstable; urgency=low
 
   * New upstream release
 
- -- Oscar Aceña <oscaracena@gmail.com>  Mon, 22 Feb 2010 09:40:04 +0100
+ -- Oscar Aceña Herrera <oscaracena@gmail.com>  Mon, 22 Feb 2010 09:40:04 +0100
 
-pyicebox (0.100107-1) unstable; urgency=low
+python-icebox (0.100107-1) unstable; urgency=low
 
   * New upstream release
   * Fixed some un-tracked bugs
 
- -- Oscar Aceña <oscaracena@gmail.com>  Thu, 07 Jan 2010 10:32:05 +0100
+ -- Oscar Aceña Herrera <oscaracena@gmail.com>  Thu, 07 Jan 2010 10:32:05 +0100
 
-pyicebox (0.091201-1) unstable; urgency=low
+python-icebox (0.091201-1) unstable; urgency=low
 
   * Initial release
 
- -- Oscar Aceña <oscaracena@gmail.com>  Tue, 01 Dec 2009 13:43:26 +0100
+ -- Oscar Aceña Herrera <oscaracena@gmail.com>  Tue, 01 Dec 2009 13:43:26 +0100

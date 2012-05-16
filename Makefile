@@ -2,15 +2,12 @@
 
 all:
 
-install: DEST=$(DESTDIR)/usr/share/pyicebox
 install:
-	install -D -m 644 *.py $(DEST)
-	install -D -m 644 *.ice $(DEST)
-	install -D -m 644 icebox.config $(DEST)
-	chmod a+x $(DEST)/Server.py
-
-#	# FIXME: use a relative path
-	ln -s /usr/share/pyicebox/Server.py $(DESTDIR)/usr/bin/pyicebox
+	install -d $(DESTDIR)/usr/share/pyshared/python-icebox/
+	install -D -m 644 src/*.py $(DESTDIR)/usr/share/pyshared/python-icebox/
+	install -d $(DESTDIR)/usr/share/python-icebox/doc/
+	install -D -m 644 doc/* $(DESTDIR)/usr/share/python-icebox/doc/
+	install -D -m 755 src/pyicebox $(DESTDIR)/usr/bin/
 
 .PHONY: clean
 clean:
