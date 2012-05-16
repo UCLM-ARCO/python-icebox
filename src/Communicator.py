@@ -61,8 +61,6 @@ class Communicator(Ice.Communicator):
         self.createObjectAdapterWithRouter = self._communicator.createObjectAdapterWithRouter
         self.addObjectFactory = self._communicator.addObjectFactory
         self.findObjectFactory = self._communicator.findObjectFactory
-        self.getDefaultContext = self._communicator.getDefaultContext
-        self.setDefaultContext = self._communicator.setDefaultContext
         self.getImplicitContext = self._communicator.getImplicitContext
         self.getProperties = self._communicator.getProperties
         self.getLogger = self._communicator.getLogger
@@ -81,9 +79,8 @@ class Communicator(Ice.Communicator):
             "Properties": PropertiesAdminI(self._communicator.getProperties()),
             "Process": ProcessI(self._communicator)}
 
-
     # Destroy the communicator. Implemented to keep track of status.
-    def destroy():
+    def destroy(self):
         with self._lock:
             if self._state != self.StateActive:
                 return
@@ -93,7 +90,6 @@ class Communicator(Ice.Communicator):
 
         with self._lock:
             self._state = self.StateDestroyed
-
 
     # Get a proxy to the main facet of the Admin object.
     # returns -> Object*
@@ -123,7 +119,7 @@ class Communicator(Ice.Communicator):
 
                 defaultLocator = self._communicator.getDefaultLocator()
 
-                if (defaultLocator and serverId) or instancename:
+                if (defaultLocator and serverId) or instanceName:
                     if not self._adminIdentity:
 
                         if not instanceName:
@@ -203,7 +199,6 @@ class Communicator(Ice.Communicator):
 
         return admin
 
-
     # Add a new facet to the Admin object.
     # servant:Object, facet:string
     @synchronized
@@ -219,7 +214,6 @@ class Communicator(Ice.Communicator):
 
         else:
             self._adminAdapter.addFacet(servant, self._adminIdentity, facet)
-
 
     # Remove the following facet to the Admin object.
     # facet:string
@@ -241,5 +235,3 @@ class Communicator(Ice.Communicator):
             result = self._adminAdapter.removeFacet(self._adminIdentity, facet)
 
         return result
-
-
