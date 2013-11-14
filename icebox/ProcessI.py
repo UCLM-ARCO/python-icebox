@@ -21,7 +21,8 @@
 import sys
 
 import Ice
-Ice.loadSlice("{0}/Ice/Process.ice".format(Ice.getSliceDir()))
+slice_dir = Ice.getSliceDir() or "/usr/share/Ice/slice"
+Ice.loadSlice("{0}/Ice/Process.ice".format(slice_dir))
 
 
 class ProcessI(Ice.Process):

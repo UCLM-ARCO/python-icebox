@@ -18,8 +18,8 @@ cfg.gen += config_file
 
 
 # Launch services
-d = Daemon("$basedir/src/pyicebox --Ice.Config={0}".format(config_file),
-           env={"PYTHONPATH":"$testdir"}, delay=1)
+d = Daemon("$basedir/icebox/pyicebox --Ice.Config={0}".format(config_file),
+           env={"PYTHONPATH":"$basedir:$testdir"}, delay=1)
 d.post += FileContains("TestService1 started\n"
                        "TestService3 started\n"
                        "TestService2 started")

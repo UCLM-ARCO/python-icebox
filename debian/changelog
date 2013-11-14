@@ -1,3 +1,9 @@
+python-icebox (0.20131114-1) unstable; urgency=low
+
+  * New release (support for Ice 3.5)
+
+ -- Oscar Aceña Herrera <oscaracena@gmail.com>  Thu, 14 Nov 2013 11:25:30 +0100
+
 python-icebox (0.120516-1) unstable; urgency=low
 
   * New upstream release (support Ice3.4)

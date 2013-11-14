@@ -24,8 +24,8 @@ cfg1.gen += config1_file
 
 
 # Launch service
-d = Daemon("$basedir/src/pyicebox --Ice.Config={0}".format(config1_file),
-           env={"PYTHONPATH":"$testdir"})
+d = Daemon("$basedir/icebox/pyicebox --Ice.Config={0}".format(config1_file),
+           env={"PYTHONPATH":"$basedir:$testdir"})
 d.pre += Not(OpenPort(9988))
 d.pre += Not(OpenPort(9989))
 

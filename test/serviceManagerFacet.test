@@ -14,8 +14,8 @@ cfg.gen += config_file
 
 # Launch icebox
 str_prx = "IceBox/ServiceManager -t:tcp -h localhost -p 9999"
-d = Daemon("$basedir/src/pyicebox --Ice.Config={0}".format(config_file),
-           env={"PYTHONPATH":"$testdir"})
+d = Daemon("$basedir/icebox/pyicebox --Ice.Config={0}".format(config_file),
+           env={"PYTHONPATH":"$basedir:$testdir"})
 d.pre += Not(OpenPort(9988))
 d.post += FileContains("TestService stopped")
 
