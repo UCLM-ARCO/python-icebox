@@ -70,10 +70,8 @@ class ServiceManagerI(IceBox.ServiceManager):
         # for using on synchronized methods
         self._lock = RLock()
 
-
     def getSliceChecksums(self, current):
         return Ice.sliceChecksums
-
 
     def startService(self, name, current):
         info = None
@@ -99,12 +97,14 @@ class ServiceManagerI(IceBox.ServiceManager):
         started = False
 
         try:
-            if info.communicator: comm = info.communicator
-            else: comm = self._sharedCommunicator
+            if info.communicator:
+                comm = info.communicator
+            else:
+                comm = self._sharedCommunicator
             info.service.start(name, comm, info.args)
             started = True
 
-        except Exception, e:
+        except Exception:
             sio = StringIO()
             traceback.print_exc(file=sio)
             self._logger.warning(
@@ -125,7 +125,6 @@ class ServiceManagerI(IceBox.ServiceManager):
 
             # notifyAll() is implicit
             self._statusChangesDone.set()
-
 
     def stopService(self, name, current):
         info = None
@@ -152,7 +151,7 @@ class ServiceManagerI(IceBox.ServiceManager):
             info.service.stop()
             stopped = True
 
-        except Exception, e:
+        except Exception:
             sio = StringIO()
             traceback.print_exc(file=sio)
             self._logger.warning(
@@ -174,7 +173,6 @@ class ServiceManagerI(IceBox.ServiceManager):
             # notifyAll() is implicit
             self._statusChangesDone.set()
 
-
     def addObserver(self, observer, current):
         activeServices = []
 
@@ -192,23 +190,14 @@ class ServiceManagerI(IceBox.ServiceManager):
                         activeServices.append(info.name)
 
         if activeServices:
+            def servicesStarted_failure(ex):
+                # Drop this observer
+                self._removeObserver(observer, ex)
 
-            class AMI_ServiceObserver_servicesStarted:
-                def ice_response(cls):
-                    # ok, success
-                    pass
-
-                def ice_exception(cls, ex):
-                    # Drop this observer
-                    self._removeObserver(observer, ex)
-
-            cb = AMI_ServiceObserver_servicesStarted()
-            observer.servicesStarted_async(cb, activeServices)
-
+            observer.begin_servicesStarted(activeServices, _ex=servicesStarted_failure)
 
     def shutdown(self, current):
         self._communicator.shutdown()
-
 
     def run(self):
         try:
@@ -252,7 +241,7 @@ class ServiceManagerI(IceBox.ServiceManager):
                 servicesInfo.append(self.StartServiceInfo(i, value, self._argv))
                 services.pop(key)
 
-            for k,value in services.items():
+            for k, value in services.items():
                 name = k.replace(prefix, "")
                 servicesInfo.append(self.StartServiceInfo(name, value, self._argv))
 
@@ -283,7 +272,7 @@ class ServiceManagerI(IceBox.ServiceManager):
 
                     # Add the service properties to the shared communicator
                     # properties.
-                    for k,v in svcProperties.getPropertiesForPrefix("").items():
+                    for k, v in svcProperties.getPropertiesForPrefix("").items():
                         initData.properties.setProperty(k, v)
 
                     # Parse <service>.* command line options (the Ice command line
@@ -324,13 +313,13 @@ class ServiceManagerI(IceBox.ServiceManager):
                                                      "IceBox.Service." + info.name + ".Properties")
                 self._communicator.getAdmin()
 
-            except Ice.ObjectAdapterDeactivatedException, ex:
+            except Ice.ObjectAdapterDeactivatedException as ex:
                 pass
 
             if adapter:
                 try:
                     adapter.activate()
-                except Ice.ObjectAdapterDeactivatedException, ex:
+                except Ice.ObjectAdapterDeactivatedException as ex:
                     pass
 
             self._communicator.waitForShutdown()
@@ -338,7 +327,7 @@ class ServiceManagerI(IceBox.ServiceManager):
             # Invoke stop() on the services.
             self._stopAll()
 
-        except IceBox.FailureException, ex:
+        except IceBox.FailureException as ex:
             sio = StringIO()
             sio.write(ex.reason + "\n")
             traceback.print_exc(file=sio)
@@ -346,14 +335,14 @@ class ServiceManagerI(IceBox.ServiceManager):
             self._stopAll()
             return 1
 
-        except Ice.LocalException, ex:
+        except Ice.LocalException as ex:
             sio = StringIO()
             traceback.print_exc(file=sio)
             self._logger.error("ServiceManager: " + str(ex) + "\n" + _ftrace(sio.getvalue()))
             self._stopAll()
             return 1
 
-        except Exception, ex:
+        except Exception as ex:
             sio = StringIO()
             traceback.print_exc(file=sio)
             self._logger.error("ServiceManager: unknown exception: " + str(ex) +
@@ -362,7 +351,6 @@ class ServiceManagerI(IceBox.ServiceManager):
             return 1
 
         return 0
-
 
     @synchronized
     def _start(self, service, classPath, args):
@@ -393,16 +381,16 @@ class ServiceManagerI(IceBox.ServiceManager):
 
             info.service = obj
 
-        except ImportError, ex:
+        except ImportError as ex:
             raise IceBox.FailureException(
                 "ServiceManager: class " + classPath + " not found\n" + str(ex))
 
-        except AttributeError, ex:
+        except AttributeError as ex:
             raise IceBox.FailureException(
                 "ServiceManager: module " + moduleName + " has no member " + className +
                 "\n" + str(ex))
 
-        except TypeError, ex:
+        except TypeError as ex:
             raise IceBox.FailureException(
                 "ServiceManager: unable to instantiate class " + classPath +
                 "\n" + str(ex))
@@ -415,9 +403,9 @@ class ServiceManagerI(IceBox.ServiceManager):
             # defined, add the service properties to the shared
             # commnunicator property set.
 
-            commnunicator = None
+            communicator = None
             if self._communicator.getProperties().getPropertyAsInt(
-                "IceBox.UseSharedCommunicator." + service) > 0:
+                    "IceBox.UseSharedCommunicator." + service) > 0:
                 assert self._sharedCommunicator, "invalid shared communicator"
                 communicator = self._sharedCommunicator
 
@@ -454,18 +442,18 @@ class ServiceManagerI(IceBox.ServiceManager):
                 # the Server Admin object, and before the activation of the main
                 # object adapter (so before any observer can be registered)
 
-            except Exception, ex:
+            except Exception as ex:
                 if info.communicator:
                     try:
                         info.communicator.shutdown()
                         info.communicator.waitForShutdown()
 
-                    except Ice.CommunicatorDestroyedException, ex:
+                    except Ice.CommunicatorDestroyedException as ex:
                         # Ignore, the service might have already destroyed
                         # the communicator for its own reasons.
                         pass
 
-                    except Exception, e:
+                    except Exception:
                         sio = StringIO()
                         traceback.print_exc(file=sio)
                         self._logger.warning(
@@ -474,7 +462,7 @@ class ServiceManagerI(IceBox.ServiceManager):
 
                     try:
                         info.communicator.destroy()
-                    except Exception, e:
+                    except Exception:
                         sio = StringIO()
                         traceback.print_exc(file=sio)
                         self._logger.warning(
@@ -485,13 +473,12 @@ class ServiceManagerI(IceBox.ServiceManager):
 
             self._services.append(info)
 
-        except IceBox.FailureException, ex:
+        except IceBox.FailureException as ex:
             raise
 
-        except Exception, ex:
+        except Exception as ex:
             raise IceBox.FailureException(
                 "ServiceManager: exception while starting service " + service + ": " + str(ex))
-
 
     @synchronized
     def _stopAll(self):
@@ -510,7 +497,7 @@ class ServiceManagerI(IceBox.ServiceManager):
                     info.status = self.StatusStopped
                     stoppedServices.append(info.name)
 
-                except Exception, e:
+                except Exception:
                     sio = StringIO()
                     traceback.print_exc(file=sio)
                     self._logger.warning(
@@ -521,7 +508,7 @@ class ServiceManagerI(IceBox.ServiceManager):
                 self._communicator.removeAdminFacet(
                     "IceBox.Service." + info.name + ".Properties")
 
-            except Ice.LocalException, e:
+            except Ice.LocalException:
                 # Ignored
                 pass
 
@@ -530,13 +517,13 @@ class ServiceManagerI(IceBox.ServiceManager):
                     info.communicator.shutdown()
                     info.communicator.waitForShutdown()
 
-                except Ice.CommunicatorDestroyedException, e:
+                except Ice.CommunicatorDestroyedException:
 
                     # Ignore, the service might have already destroyed
                     # the communicator for its own reasons.
                     pass
 
-                except Exception, e:
+                except Exception:
                     sio = StringIO()
                     traceback.print_exc(file=sio)
                     self._logger.warning(
@@ -546,7 +533,7 @@ class ServiceManagerI(IceBox.ServiceManager):
                 try:
                     info.communicator.destroy()
 
-                except Exception, e:
+                except Exception:
                     sio = StringIO()
                     traceback.print_exc(file=sio)
                     self._logger.warning(
@@ -557,7 +544,7 @@ class ServiceManagerI(IceBox.ServiceManager):
             try:
                 self._sharedCommunicator.destroy()
 
-            except Exception, e:
+            except Exception:
                 sio = StringIO()
                 traceback.print_exc(file=sio)
                 self._logger.warning(
@@ -569,47 +556,33 @@ class ServiceManagerI(IceBox.ServiceManager):
         self._services = []
         self._servicesStopped(stoppedServices, self._observers)
 
-
     def _servicesStarted(self, services, observers):
         if services:
 
-            class AMI_ServiceObserver_servicesStarted:
-                def ice_response(cls):
-                    # ok, success
-                    pass
-
-                def ice_exception(cls, ex):
+            for observer in observers:
+                def servicesStarted_failure(ex):
                     # Drop this observer
                     self._removeObserver(observer, ex)
 
-            for observer in observers:
-                cb = AMI_ServiceObserver_servicesStarted()
-                observer.servicesStarted_async(cb, services)
-
+                observer.begin_servicesStarted(
+                    services, _ex=servicesStarted_failure)
 
     def _servicesStopped(self, services, observers):
         if services:
 
-            class AMI_ServiceObserver_servicesStopped:
-                def ice_response(cls):
-                    # ok, success
-                    pass
-
-                def ice_exception(cls, ex):
+            for observer in observers:
+                def servicesStopped_failure(ex):
                     # Drop this observer
                     self._removeObserver(observer, ex)
 
-            for observer in observers:
-                cb = AMI_ServiceObserver_servicesStopped()
-                observer.servicesStopped_async(cb, services)
-
+                observer.begin_servicesStopped(
+                    services, _ex=servicesStopped_failure)
 
     @synchronized
     def _removeObserver(self, observer, ex):
         if observer in self._observers:
             self._observers.remove(observer)
             self.observerRemoved(observer, ex)
-
 
     def observerRemoved(self, observer, ex):
         if self._traceServiceObserver >= 1:
@@ -624,12 +597,9 @@ class ServiceManagerI(IceBox.ServiceManager):
                     "Removed service observer " + self._communicator.proxyToString(observer) +
                     "\nafter catching " + str(ex))
 
-
     StatusStopping, StatusStopped, StatusStarting, StatusStarted = range(4)
 
-
     class ServiceInfo:
-
         def __init__(self):
             self.name = ""
             self.service = None
@@ -640,9 +610,7 @@ class ServiceManagerI(IceBox.ServiceManager):
         def clone(self):
             return copy.copy(self)
 
-
     class StartServiceInfo:
-
         def __init__(self, service, value, serverArgs):
             self.name = service
 
@@ -668,15 +636,13 @@ class ServiceManagerI(IceBox.ServiceManager):
                 if j.startswith("--" + service + "."):
                     self.args.append(j)
 
-
-
     # private
     def _createServiceProperties(self, service):
         properties = Ice.createProperties()
         communicatorProperties = self._communicator.getProperties()
 
         if communicatorProperties.getPropertyAsInt(
-            "IceBox.InheritProperties") > 0:
+                "IceBox.InheritProperties") > 0:
 
             properties = communicatorProperties.clone()
             # Inherit all except Ice.Admin.Endpoints!
@@ -686,7 +652,7 @@ class ServiceManagerI(IceBox.ServiceManager):
         if not programName:
             properties.setProperty("Ice.ProgramName", service)
         else:
-            properties.setProperty("Ice.ProgramName", programName +"-"+ service)
+            properties.setProperty("Ice.ProgramName", programName + "-" + service)
 
         return properties
 
